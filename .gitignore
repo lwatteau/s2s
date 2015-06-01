@@ -1,0 +1,25 @@
+# The files below are automatically generated
+src/version.hpp
+
+#----- Object files resulting from compilation
+*.o
+**/*.o
+
+#----- CMakei/ Make files
+CMakeCache.txt
+CMakeFiles/*
+CTestTestfile.cmake
+Makefile
+cmake_install.cmake
+**/CMakeCache.txt
+**/CMakeFiles/*
+**/CTestTestfile.cmake
+**/Makefile
+**/cmake_install.cmake
+
+#----- Build directory for out-of-source build
+build/*
+
+#----- bin
+#bin/*
+

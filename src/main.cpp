@@ -31,8 +31,7 @@ using namespace std;
 auto remove_leading_spaces(const string& input) -> string
 {
     smatch m;
-    regex leading_spaces("^[[:space:]]*");
-    regex_search(input, m, leading_spaces);
+    regex_search(input, m, regex("^[[:space:]]*"));
     return m.suffix().str();
 }
 
@@ -42,10 +41,10 @@ struct block
     vector<string> m_board;
 };
 
-unsigned int stack_state = 1;
-vector<block*> m_stack;
+unsigned int stack_state {1};
+auto m_stack = vector<block*> {};
 
-typedef bool (*parser_func)(const std::string&);
+using parser_func = bool(*)(const std::string&);
 
 //------------------------------------------------------------------------------
 auto get_context() -> block* 
@@ -109,7 +108,7 @@ auto write_open_bracket(const string& payload) -> bool
 {
     return write(payload);
 }
-//
+
 //------------------------------------------------------------------------------
 auto write_close_bracket(const string& payload) -> bool
 {
@@ -160,7 +159,7 @@ std::map<std::string, parser_func> parser {
 };
 
 //------------------------------------------------------------------------------
-void process_istream(std::istream& is)
+auto process_istream(std::istream& is) -> bool
 {
     //In S2S, each line is keyword + payload (set of arguments)
     static const auto keyword_expr = std::regex { 
@@ -195,5 +194,5 @@ void process_istream(std::istream& is)
 //------------------------------------------------------------------------------
 auto main() -> int
 {
-    process_istream(cin);
+    return process_istream(cin) ? 0: 1;
 }
