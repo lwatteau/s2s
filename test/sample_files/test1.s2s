@@ -1,0 +1,27 @@
+{a
+[begin block a
+|ligne1
+{b
+|ligne2
+}
+?b
+|ligne3
+]end block a
+}
+?a
+
+
+{c
+|ligne2
+}
+
+{d
+[begin block d
+|ligne1
+?c
+|ligne3
+]end block d
+}
+?d
+?c
+

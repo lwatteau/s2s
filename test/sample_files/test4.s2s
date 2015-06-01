@@ -1,0 +1,15 @@
+[A
+    [B
+        [C
+            [D
+                [E
+                |E content
+                ]E
+            ]D
+        ]C
+    ]B
+]A
+
+
+]Should not fail
+]Should not fail

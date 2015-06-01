@@ -39,10 +39,12 @@ struct block
 {
     string m_id;
     vector<string> m_board;
+    int m_indent_level = 0;
 };
 
 unsigned int stack_state {1};
 auto m_stack = vector<block*> {};
+block* root_context = nullptr;
 
 using parser_func = bool(*)(const std::string&);
 
@@ -57,7 +59,7 @@ auto get_context() -> block*
             return m_stack[max-pos-1];
         ++pos;
     }
-    return nullptr;
+    return root_context;
 }
 
 //------------------------------------------------------------------------------
@@ -77,7 +79,7 @@ auto open(const string& payload) -> bool
 //------------------------------------------------------------------------------
 auto close(const string& dummy) -> bool
 {
-    if (nullptr == get_context())
+    if (root_context == get_context())
         return false; //We are in the root, so stop the program
     
     ++stack_state;
@@ -91,11 +93,17 @@ auto close(const string& dummy) -> bool
 }
 
 //------------------------------------------------------------------------------
-auto write(const string& line) -> bool
+auto write(const string& payload) -> bool
 {
     auto cont = get_context();
 
-    if (nullptr == cont)            //We are in the root context
+    string space("    ");
+    string line;
+    for(int i=0; i < cont->m_indent_level; ++i)
+        line+=space;
+    line+=payload;
+
+    if (root_context == cont)            //We are in the root context
         cout << line << endl;    //We write into the context board
     else                        
         cont->m_board.push_back(line);
@@ -106,12 +114,18 @@ auto write(const string& line) -> bool
 //------------------------------------------------------------------------------
 auto write_open_bracket(const string& payload) -> bool
 {
-    return write(payload);
+    auto cont = get_context();
+    auto res = write(payload);
+    ++(cont->m_indent_level);
+    return res;
 }
 
 //------------------------------------------------------------------------------
 auto write_close_bracket(const string& payload) -> bool
 {
+    auto cont = get_context();
+    if ((--cont->m_indent_level)<0)
+        cont->m_indent_level = 0;
     return write(payload);
 }
 
@@ -148,6 +162,15 @@ auto require(const string& id) -> bool
     cerr << "bad context for " << m_stack[index]->m_id << endl;
     return false;
 }
+
+//------------------------------------------------------------------------------
+auto comment(const string& payload) -> bool
+{
+    return true;
+}
+
+
+
 //------------------------------------------------------------------------------
 std::map<std::string, parser_func> parser {
     {"{",           open},
@@ -155,7 +178,8 @@ std::map<std::string, parser_func> parser {
     {"?",           require},
     {"|",           write},
     {"[",           write_open_bracket},
-    {"]",           write_close_bracket}
+    {"]",           write_close_bracket},
+    {"#",           comment}
 };
 
 //------------------------------------------------------------------------------
@@ -170,6 +194,7 @@ auto process_istream(std::istream& is) -> bool
         R"(\||)"
         R"(\[|)"
         R"(\]|)"
+        R"(\#|)"
     };
                          
     auto input_line = ""s;
@@ -185,7 +210,6 @@ auto process_istream(std::istream& is) -> bool
     
         string keyword = m.str();
         string payload = m.suffix();
-
         //Récupération du nouveau contexte
         parser[keyword](payload); 
     }
@@ -194,5 +218,12 @@ auto process_istream(std::istream& is) -> bool
 //------------------------------------------------------------------------------
 auto main() -> int
 {
+
+    //[TODO] refactor the code below
+    //This is the @ block
+
+    root_context= new block;
+    root_context->m_id="@";
+
     return process_istream(cin) ? 0: 1;
 }
