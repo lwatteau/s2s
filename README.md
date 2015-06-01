@@ -13,6 +13,7 @@ Considering the file _sample1.s2s_:
             |echo "This is b"
             ?c
         }
+        ?b
     }
     ?a
 
