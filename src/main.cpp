@@ -19,8 +19,6 @@
 //------------------------------------------------------------------------------
 
 //S2S
-#include "tools.hpp"
-
 
 //C++ STANDARD
 #include <iostream>
@@ -28,6 +26,9 @@
 #include <regex>
 #include <string>
 #include <vector>
+
+//BOOST
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 
@@ -61,7 +62,7 @@ auto get_context() -> block*
 //------------------------------------------------------------------------------
 auto open(const string& payload) -> bool
 {
-    auto id = remove_leading_spaces(payload);
+    auto id = boost::trim_left_copy(payload);
 
     stack_state <<= 1;
 
@@ -191,10 +192,12 @@ auto process_istream(std::istream& is) -> bool
         R"(\#|)"
     };
                          
-    auto input_line = ""s;
-    while (std::getline(is, input_line))
+    auto line = ""s;
+    while (std::getline(is, line))
     {
-        string line(remove_leading_spaces(input_line));
+    
+        boost::trim(line);
+
        
         //skips blank line
         if (line.empty()) continue;
@@ -203,6 +206,13 @@ auto process_istream(std::istream& is) -> bool
         regex_search(line, m, keyword_expr);
     
         string keyword = m.str();
+
+        if (keyword.empty())
+        {
+            cerr << "Unknown keyword" << endl;
+            continue;
+        }
+        
         string payload = m.suffix();
         //Récupération du nouveau contexte
         if (!parser[keyword](payload))
