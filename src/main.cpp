@@ -18,6 +18,10 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
+//S2S
+#include "tools.hpp"
+
+
 //C++ STANDARD
 #include <iostream>
 #include <map>
@@ -26,14 +30,6 @@
 #include <vector>
 
 using namespace std;
-
-//------------------------------------------------------------------------------
-auto remove_leading_spaces(const string& input) -> string
-{
-    smatch m;
-    regex_search(input, m, regex("^[[:space:]]*"));
-    return m.suffix().str();
-}
 
 struct block
 {
@@ -169,8 +165,6 @@ auto comment(const string& payload) -> bool
     return true;
 }
 
-
-
 //------------------------------------------------------------------------------
 std::map<std::string, parser_func> parser {
     {"{",           open},
@@ -211,8 +205,10 @@ auto process_istream(std::istream& is) -> bool
         string keyword = m.str();
         string payload = m.suffix();
         //Récupération du nouveau contexte
-        parser[keyword](payload); 
+        if (!parser[keyword](payload))
+            return true; //End of program
     }
+    return true;
 }
 
 //------------------------------------------------------------------------------

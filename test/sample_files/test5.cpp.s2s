@@ -1,0 +1,15 @@
+{hello
+|#include <iostream>
+|
+|using namespace std;
+|
+|auto main() -> int
+[{
+    |cout << "Hello, S2S world! << endl;
+]}
+}#hello
+
+
+?hello
+?hello
+?hello
