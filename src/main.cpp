@@ -34,14 +34,16 @@ using namespace std;
 
 struct block
 {
-    string m_id;
-    vector<string> m_board;
-    int m_indent_level = 0;
+    string m_id {};
+    vector<string> m_board {};
+    int m_indent_level {0};
 };
 
-unsigned int stack_state {1};
-auto m_stack = vector<block*> {};
-block* root_context = nullptr;
+auto stack_state = 1u;
+//auto m_stack = vector<block*> {};
+block* root_context {nullptr};
+auto m_stack = vector<decltype(root_context)> {};
+
 
 using parser_func = bool(*)(const std::string&);
 
@@ -80,7 +82,7 @@ auto close(const string& dummy) -> bool
         return false; //We are in the root, so stop the program
     
     ++stack_state;
-    while ((stack_state%2) == 0 )
+    while ((stack_state % 2) == 0 )
     {
         stack_state >>= 1;
         if (stack_state > 1)
@@ -94,11 +96,11 @@ auto write(const string& payload) -> bool
 {
     auto cont = get_context();
 
-    string space("    ");
-    string line {};
-    for(int i=0; i < cont->m_indent_level; ++i)
-        line+=space;
-    line+=payload;
+    auto space = "    "s;
+    auto line  = ""s;
+    for (int i=0; i < cont->m_indent_level; ++i)
+        line += space;
+    line += payload;
 
     if (root_context == cont)            //We are in the root context
         cout << line << endl;    //We write into the context board
@@ -121,7 +123,7 @@ auto write_open_bracket(const string& payload) -> bool
 auto write_close_bracket(const string& payload) -> bool
 {
     auto cont = get_context();
-    if ((--cont->m_indent_level)<0)
+    if (--cont->m_indent_level < 0)
         cont->m_indent_level = 0;
     return write(payload);
 }
@@ -145,7 +147,7 @@ auto require(const string& id) -> bool
         return false;
     }
     //Then, look if it's opened/closed
-    if (stack_state & (1 << (max-index-1)))
+    if (stack_state & (1 << (max - index - 1)))
     {
         //We get the context, and we write the required block into it
         
