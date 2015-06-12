@@ -30,6 +30,11 @@
 //BOOST
 #include <boost/algorithm/string.hpp>
 
+
+//[TODO]: Move in 'magic.hpp'
+const auto default_tabspace = 4u;
+auto tabspace = default_tabspace;
+
 using namespace std;
 
 struct block
@@ -96,7 +101,7 @@ auto write(const string& payload) -> bool
 {
     auto cont = get_context();
 
-    auto space = "    "s;
+    auto space = string(tabspace, ' ');
     auto line  = ""s;
     for (int i=0; i < cont->m_indent_level; ++i)
         line += space;
