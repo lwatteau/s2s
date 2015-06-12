@@ -19,31 +19,31 @@
 //------------------------------------------------------------------------------
 
 //S2S
-#include "cmdline_parser.hpp"
-#include "parser.hpp"
+#include "config.hpp"
+#include "magic.hpp"
 
 //C++ STANDARD
 #include <iostream>
 
+//BOOST
+#include <boost/program_options.hpp>
+
+using namespace std;
+
 //------------------------------------------------------------------------------
-auto main(int argc, char* argv[]) -> int
+config::config()
 {
-    parser::init(cmdline_parser(argc, argv));
-
-     return parser::process_istream(std::cin) ? 0: 1;
+        m_tabspace = magic::default_tabspace;
 }
+//
+//------------------------------------------------------------------------------
+auto config::tabspace() const -> unsigned int
+{
+    return m_tabspace;
+}    
 
-
-
-
-
-
-
-//[TODO] refactor the code below
-
-    //This is the @ block
-
-//    root_context= new block;
-//    root_context->m_id="@";
-
-
+//------------------------------------------------------------------------------
+void config::tabspace(unsigned int value)
+{
+    m_tabspace = value;
+}

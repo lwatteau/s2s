@@ -20,30 +20,23 @@
 
 //S2S
 #include "cmdline_parser.hpp"
-#include "parser.hpp"
+#include "config.hpp"
 
 //C++ STANDARD
 #include <iostream>
 
+//BOOST
+#include <boost/program_options.hpp>
+
+using namespace std;
+
 //------------------------------------------------------------------------------
-auto main(int argc, char* argv[]) -> int
+auto cmdline_parser(int argc, char* argv[]) -> std::unique_ptr<config>
 {
-    parser::init(cmdline_parser(argc, argv));
+    auto conf = make_unique<config>();
+    
+    //TODO
 
-     return parser::process_istream(std::cin) ? 0: 1;
+
+    return move(conf);
 }
-
-
-
-
-
-
-
-//[TODO] refactor the code below
-
-    //This is the @ block
-
-//    root_context= new block;
-//    root_context->m_id="@";
-
-

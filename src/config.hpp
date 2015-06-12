@@ -17,33 +17,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
-
-//S2S
-#include "cmdline_parser.hpp"
-#include "parser.hpp"
+#ifndef MD_S2S_CONFIG_HPP_
+#define MD_S2S_CONFIG_HPP_
 
 //C++ STANDARD
-#include <iostream>
+#include <memory>
 
 //------------------------------------------------------------------------------
-auto main(int argc, char* argv[]) -> int
+class config
 {
-    parser::init(cmdline_parser(argc, argv));
+public:
+    config();
+    
+    auto tabspace() const -> unsigned int;
+    void tabspace(unsigned int value);
 
-     return parser::process_istream(std::cin) ? 0: 1;
-}
+private:
 
-
-
-
-
-
-
-//[TODO] refactor the code below
-
-    //This is the @ block
-
-//    root_context= new block;
-//    root_context->m_id="@";
-
-
+    unsigned int m_tabspace;
+};
+#endif //#ifndef MD_S2S_CONFIG_HPP_
