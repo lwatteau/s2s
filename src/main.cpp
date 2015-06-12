@@ -19,6 +19,7 @@
 //------------------------------------------------------------------------------
 
 //S2S
+#include "magic.hpp"
 
 //C++ STANDARD
 #include <iostream>
@@ -30,10 +31,7 @@
 //BOOST
 #include <boost/algorithm/string.hpp>
 
-
-//[TODO]: Move in 'magic.hpp'
-const auto default_tabspace = 4u;
-auto tabspace = default_tabspace;
+auto tabspace = magic::default_tabspace;
 
 using namespace std;
 
@@ -49,7 +47,6 @@ auto stack_state = 1u;
 block* root_context {nullptr};
 auto m_stack = vector<decltype(root_context)> {};
 
-
 using parser_func = bool(*)(const std::string&);
 
 //------------------------------------------------------------------------------
@@ -57,12 +54,14 @@ auto get_context() -> block*
 {
     auto max = m_stack.size();
     decltype(max) pos {0};
+    
     while (pos < max)
     {
         if (!(stack_state & (1<<pos)))
             return m_stack[max-pos-1];
         ++pos;
     }
+    
     return root_context;
 }
 
@@ -93,6 +92,7 @@ auto close(const string& dummy) -> bool
         if (stack_state > 1)
             m_stack.pop_back();
     }
+    
     return true;
 }
 
@@ -100,8 +100,7 @@ auto close(const string& dummy) -> bool
 auto write(const string& payload) -> bool
 {
     auto cont = get_context();
-
-    auto space = string(tabspace, ' ');
+    const auto space = string(tabspace, ' ');
     auto line  = ""s;
     for (int i=0; i < cont->m_indent_level; ++i)
         line += space;
@@ -118,9 +117,8 @@ auto write(const string& payload) -> bool
 //------------------------------------------------------------------------------
 auto write_open_bracket(const string& payload) -> bool
 {
-    auto cont = get_context();
     auto res = write(payload);
-    ++(cont->m_indent_level);
+    ++(get_context()->m_indent_level);
     return res;
 }
 
@@ -139,6 +137,7 @@ auto require(const string& id) -> bool
     //First, find if in the stack...
     auto max = m_stack.size();
     decltype(max) index {0};
+
     while (index < max)
     {
         if (0 == id.compare(m_stack[index]->m_id))
@@ -151,16 +150,12 @@ auto require(const string& id) -> bool
         cerr << id << " is not defined" << endl;
         return false;
     }
+    
     //Then, look if it's opened/closed
     if (stack_state & (1 << (max - index - 1)))
     {
-        //We get the context, and we write the required block into it
-        
-        auto b = get_context();
-
         for (const auto& elem : m_stack[index]->m_board)
             write(elem);
-
         return true;
     }
     cerr << "bad context for " << m_stack[index]->m_id << endl;
@@ -210,7 +205,7 @@ auto process_istream(std::istream& is) -> bool
         auto m = smatch {};
         regex_search(line, m, keyword_expr);
     
-        string keyword = m.str();
+        auto keyword = m.str();
 
         if (keyword.empty())
         {
@@ -218,7 +213,7 @@ auto process_istream(std::istream& is) -> bool
             continue;
         }
         
-        string payload = m.suffix();
+        auto payload = m.suffix();
         //Récupération du nouveau contexte
         if (!parser[keyword](payload))
             return true; //End of program
@@ -229,7 +224,6 @@ auto process_istream(std::istream& is) -> bool
 //------------------------------------------------------------------------------
 auto main() -> int
 {
-
     //[TODO] refactor the code below
     //This is the @ block
 
