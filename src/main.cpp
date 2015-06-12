@@ -49,7 +49,7 @@ using parser_func = bool(*)(const std::string&);
 auto get_context() -> block* 
 {
     auto max = m_stack.size();
-    auto pos = 0;
+    decltype(max) pos {0};
     while (pos < max)
     {
         if (!(stack_state & (1<<pos)))
@@ -95,7 +95,7 @@ auto write(const string& payload) -> bool
     auto cont = get_context();
 
     string space("    ");
-    string line;
+    string line {};
     for(int i=0; i < cont->m_indent_level; ++i)
         line+=space;
     line+=payload;
@@ -131,10 +131,10 @@ auto require(const string& id) -> bool
 {
     //First, find if in the stack...
     auto max = m_stack.size();
-    auto index = 0;
+    decltype(max) index {0};
     while (index < max)
     {
-        if (id.compare(m_stack[index]->m_id)==0)
+        if (0 == id.compare(m_stack[index]->m_id))
             break;
         ++index;
     }
@@ -195,9 +195,7 @@ auto process_istream(std::istream& is) -> bool
     auto line = ""s;
     while (std::getline(is, line))
     {
-    
         boost::trim(line);
-
        
         //skips blank line
         if (line.empty()) continue;
