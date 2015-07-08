@@ -19,18 +19,7 @@
 //------------------------------------------------------------------------------
 
 //S2S
-#include "cmdline_parser.hpp"
-#include "parser.hpp"
+#include "context.hpp"
 
 //C++ STANDARD
-#include <cstdlib>
-#include <iostream>
-
-//------------------------------------------------------------------------------
-auto main(int argc, char* argv[]) -> int
-{
-    parser::init(cmdline_parser(argc, argv));
-
-     return parser::process_istream(std::cin) ? EXIT_SUCCESS: EXIT_FAILURE;
-}
 

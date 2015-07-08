@@ -31,7 +31,7 @@
 #include <string>
 #include <vector>
 
-class block;
+class context;
 
 
 class parser
@@ -43,7 +43,7 @@ public:
 
 
 private:
-    static auto get_context() -> block*; 
+    static auto get_context() -> context*; 
     static auto open(const std::string& payload) -> bool;
     static auto close(const std::string& dummy) -> bool;
     static auto write(const std::string& payload) -> bool;
@@ -53,6 +53,11 @@ private:
     static auto comment(const std::string& payload) -> bool;
 
 private:
+
+    static unsigned int tabspace;
+    static unsigned int stack_state;
+    static context* root_context;
+    static std::vector<decltype(root_context)> m_stack;
 
     using parser_func = bool(*)(const std::string&);
     static std::map<std::string, parser_func> parser_map;

@@ -17,20 +17,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
+#ifndef MD_S2S_CONTEXT_HPP_
+#define MD_S2S_CONTEXT_HPP_
 
 //S2S
-#include "cmdline_parser.hpp"
-#include "parser.hpp"
 
 //C++ STANDARD
-#include <cstdlib>
-#include <iostream>
+#include <string>
+#include <vector>
 
-//------------------------------------------------------------------------------
-auto main(int argc, char* argv[]) -> int
+struct context
 {
-    parser::init(cmdline_parser(argc, argv));
+    std::string m_id {};
+    std::vector<std::string> m_board {};
+    int m_indent_level {0};
+};
 
-     return parser::process_istream(std::cin) ? EXIT_SUCCESS: EXIT_FAILURE;
-}
-
+#endif //#ifndef MD_S2S_CONTEXT_HPP_

@@ -19,6 +19,7 @@
 //------------------------------------------------------------------------------
 
 //S2S
+#include "context.hpp"
 #include "parser.hpp"
 #include "config.hpp"
 #include "magic.hpp"
@@ -28,25 +29,27 @@
 //BOOST
 #include <boost/algorithm/string.hpp>
 
-
-auto tabspace = magic::default_tabspace;
-
 using namespace std;
 
-struct block
-{
-    string m_id {};
-    vector<string> m_board {};
-    int m_indent_level {0};
+//VARIABLES
+unsigned int parser::tabspace { magic::default_tabspace } ;
+//------------------------------------------------------------------------------
+unsigned int parser::stack_state { 1u };
+context* parser::root_context = nullptr;
+vector<decltype(parser::root_context)> parser::m_stack;
+
+map<string, parser::parser_func> parser::parser_map {
+    {"{",           parser::open},
+    {"}",           parser::close},
+    {"?",           parser::require},
+    {"|",           parser::write},
+    {"[",           parser::write_open_bracket},
+    {"]",           parser::write_close_bracket},
+    {"#",           parser::comment}
 };
 
-auto stack_state = 1u;
-//auto m_stack = vector<block*> {};
-block* root_context {nullptr};
-auto m_stack = vector<decltype(root_context)> {};
-
 //------------------------------------------------------------------------------
-auto parser::get_context() -> block* 
+auto parser::get_context() -> context* 
 {
     auto max = m_stack.size();
     decltype(max) pos {0};
@@ -68,9 +71,9 @@ auto parser::open(const string& payload) -> bool
 
     stack_state <<= 1;
 
-    block* new_block = new block;
-    new_block->m_id=id;
-    m_stack.push_back(new_block);
+    context* new_context = new context;
+    new_context->m_id=id;
+    m_stack.push_back(new_context);
 
     return true;
 }
@@ -163,18 +166,6 @@ auto parser::comment(const string& payload) -> bool
 {
     return true;
 }
-
-//------------------------------------------------------------------------------
-map<string, parser::parser_func> parser::parser_map {
-    {"{",           parser::open},
-    {"}",           parser::close},
-    {"?",           parser::require},
-    {"|",           parser::write},
-    {"[",           parser::write_open_bracket},
-    {"]",           parser::write_close_bracket},
-    {"#",           parser::comment}
-};
-
 //------------------------------------------------------------------------------
 auto parser::process_istream(std::istream& is) -> bool
 {
@@ -221,9 +212,9 @@ void parser::init(unique_ptr<config> conf)
 {
 //[TODO] refactor the code below
 
-    //This is the @ block
+    //This is the @ context 
 
-    root_context= new block;
+    root_context= new context;
     root_context->m_id="@";
 }
 
